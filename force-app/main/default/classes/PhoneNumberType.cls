@@ -2,9 +2,16 @@ public with sharing class PhoneNumberType {
     
     public enum SERVICETYPE{INTERNATIONAL, GEOGRAPHIC, NONGEOGRAPHIC, RESERVED, CORPORTATEVOIP, MOBILE, FREEPHONE, PREMIUM, INVALID}
     
-    public integer numberAsInteger;
+    public integer numberAsInteger 
+    {
+        get { 
+            return integer.valueof(numberAsStringUnformatted); 
+        }
+    }
     public string numberAsStringUnformatted;
     public string numberAsStringFormatted;
+    public Boolean isValid;
+
     public integer numberOfDigits
     {
         get { 
@@ -28,10 +35,9 @@ public with sharing class PhoneNumberType {
     public SERVICETYPE numberType{
         get{ 
             switch on firstTwoDigits {
-                when '00' {		// when block 1
+                when '00' {
                     return SERVICETYPE.INTERNATIONAL;
                 }	
-                
                 when '01','02' {
                     return SERVICETYPE.GEOGRAPHIC;
                 }
@@ -63,7 +69,7 @@ public with sharing class PhoneNumberType {
     public PhoneNumberType(string input) {
         numberAsStringUnformatted = input.replaceAll('[^0-9]', '');
         
-        if((numberAsStringUnformatted.length() > 12) && (numberAsStringUnformatted.length() < 5))
+        if((numberAsStringUnformatted.length() > 12) || (numberAsStringUnformatted.length() < 5))
         {
             throw new PhoneNumberException('Phone Number input length should be between 5 and 15 digits');
         }
@@ -76,9 +82,9 @@ public with sharing class PhoneNumberType {
         
         if(numberAsStringUnformatted.left(1) != '0')
         {
+            // if the inputted number is not prefixed with 0, then prefix with 0
             numberAsStringUnformatted = '0' + numberAsStringUnformatted;
         }
-        
     }
     
 }
