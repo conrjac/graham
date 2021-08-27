@@ -12,6 +12,12 @@ public with sharing class PhoneNumberType {
         }
     }
     
+    public string numberTypeAsString{
+        get {
+           return numberType.name();
+        }
+    }
+
     public string firstTwoDigits
     {
         get{
@@ -21,32 +27,58 @@ public with sharing class PhoneNumberType {
     
     public SERVICETYPE numberType{
         get{ 
-            return SERVICETYPE.INTERNATIONAL;
+            switch on firstTwoDigits {
+                when '00' {		// when block 1
+                    return SERVICETYPE.INTERNATIONAL;
+                }	
+                
+                when '01','02' {
+                    return SERVICETYPE.GEOGRAPHIC;
+                }
+                when '03' {
+                    return SERVICETYPE.NONGEOGRAPHIC;
+                }
+                when '04', '06' {
+                    return SERVICETYPE.RESERVED;
+                }
+                when '05' {
+                    return SERVICETYPE.CORPORTATEVOIP;
+                }
+                when '07' {
+                    return SERVICETYPE.MOBILE;
+                }
+                when '08' {
+                    return SERVICETYPE.FREEPHONE;
+                }
+                when '09' {
+                    return SERVICETYPE.PREMIUM;
+                }
+                when else {		  
+                    return SERVICETYPE.INVALID;
+                }
+            }
         }
     }
-
-    
-    
     
     public PhoneNumberType(string input) {
         numberAsStringUnformatted = input.replaceAll('[^0-9]', '');
-
+        
         if((numberAsStringUnformatted.length() > 12) && (numberAsStringUnformatted.length() < 5))
         {
             throw new PhoneNumberException('Phone Number input length should be between 5 and 15 digits');
         }
-
+        
         if(numberAsStringUnformatted.left(2) == '44')
         {
             // number is in international format
             numberAsStringUnformatted = '0' + numberAsStringUnformatted.removeStart('44');
         }
-
+        
         if(numberAsStringUnformatted.left(1) != '0')
         {
             numberAsStringUnformatted = '0' + numberAsStringUnformatted;
         }
-
+        
     }
-
+    
 }
